@@ -74,7 +74,8 @@ class SequentialAlgorithm:
 
             l_vector = np.array([self.calculation.L_function(vertex+1) for vertex in range(self.data.shape[0])])
             vertex = l_vector.argmax()
-            print(l_vector[vertex])
+            for i in range(l_vector.size):
+                print(l_vector[i])
             print("Вершина для замены: ", vertex+1)
 
             centre = self.calculation.centre_of_mass(vertex)
