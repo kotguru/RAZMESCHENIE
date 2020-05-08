@@ -8,7 +8,7 @@ class SequentialAlgorithm:
         self.array_index = list(range(self.data.shape[0]))
         self.crystal = crystal
         self.calculation = Calculation(self.data, self.crystal, self.array_index)
-    
+
     @property
     def data(self):
         return self.__data
@@ -20,29 +20,30 @@ class SequentialAlgorithm:
         assert input_data.shape[0] == input_data.shape[1], "Matrix must be quadratic"
 
         self.__data = input_data
-    
+
     @property
     def crystal(self):
         return self.__crystal
-    
+
     @crystal.setter
     def crystal(self, crystal):
         assert isinstance(crystal, np.ndarray), "Invalid type of crystal data. Must be Numpy Array"
         assert crystal.ndim == 2, "Invalid rang of crystal matrix. Must be 2"
-        assert crystal.shape[0] * crystal.shape[1] == self.data.shape[0], "Invalid number of vertexes. Must be as initial matrix len"
-        
+        assert crystal.shape[0] * crystal.shape[1] == self.data.shape[0], "Invalid number of vertexes. Must be as " \
+                                                                          "initial matrix len "
+
         self.__crystal = crystal
-    
+
     def start_seq(self):
         index = 0
-        x,y = (0,0)
+        x, y = (0, 0)
         initial_vertex = (index, x, y)
 
         self.array_index = self.calculation.insert_vertex_in_crystal(*initial_vertex)
         vector_of_places = self.calculation.vector_of_places()
         vector_of_places.pop(0)
 
-        while(self.calculation.len_of_initial_index_array(self.array_index) > 0):
+        while self.calculation.len_of_initial_index_array(self.array_index) > 0:
             connectivity_vector = [self.calculation.connectivity_coef(vertex) for vertex in self.array_index]
             print("Вектор коэффициентов связности групп: ")
             print(connectivity_vector)
@@ -67,37 +68,38 @@ class SequentialAlgorithm:
         q = self.calculation.Q_function()
         q_new = 0
 
-        while(True):
+        while True:
             print("Значение целевой функции: ", q)
             print("Кристалл ДО итерации: ")
             print(self.crystal)
 
-            l_vector = np.array([self.calculation.L_function(vertex+1) for vertex in range(self.data.shape[0])])
+            l_vector = np.array([self.calculation.L_function(vertex + 1) for vertex in range(self.data.shape[0])])
             vertex = l_vector.argmax()
+            print(vertex)
+
             for i in range(l_vector.size):
                 print(l_vector[i])
-            print("Вершина для замены: ", vertex+1)
+            print("Вершина для замены: ", vertex + 1)
 
             centre = self.calculation.centre_of_mass(vertex)
             print("Центр масс: ", centre)
 
             vertices = self.calculation.get_near_vertexes(*centre)
-            print("Группа вершин: ", [vertex+1 for vertex in vertices])
+            print("Группа вершин: ", [vertex + 1 for vertex in vertices])
 
             args = list()
             for vertex2 in vertices:
-                self.crystal = self.calculation.swap_vertices(vertex+1, vertex2+1)
+                self.crystal = self.calculation.swap_vertices(vertex + 1, vertex2 + 1)
                 args.append((vertex, vertex2, self.calculation.Q_function()))
-                self.crystal = self.calculation.swap_vertices(vertex2+1, vertex+1)
+                self.crystal = self.calculation.swap_vertices(vertex2 + 1, vertex + 1)
             print("Значение целевой функции при замене вершины из группы вершин: ", args)
 
-            args = min(args,key=lambda x: x[2])
-            if(args[2] < q):
-
+            args = min(args, key=lambda x: x[2])
+            if args[2] < q:
                 print("Меняем вершины: ")
-                print([vertex+1 for vertex in args[:-1]])
+                print([vertex + 1 for vertex in args[:-1]])
 
-                self.crystal = self.calculation.swap_vertices(args[0]+1, args[1]+1)
+                self.crystal = self.calculation.swap_vertices(args[0] + 1, args[1] + 1)
                 q_new = args[2]
 
             print("Кристалл ПОСЛЕ итерации: ")
@@ -105,7 +107,7 @@ class SequentialAlgorithm:
 
             print("Новое начение целевой функции:", q_new, "\n")
 
-            if(q_new >= q):
+            if q_new >= q:
                 print("Очередная итерация не уменьшила значение целевой функции. Оптимизация закончена")
                 break
 
@@ -113,4 +115,3 @@ class SequentialAlgorithm:
 
     def __str__(self):
         return self.crystal.__str__()
-        
