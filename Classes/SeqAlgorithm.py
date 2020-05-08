@@ -52,9 +52,16 @@ class SequentialAlgorithm:
             print("Вершины, подлежащие размещению на кристалл: ")
             print(list_of_max)
 
+            tmp = []
+            for vertex in vector_of_places:
+                tmp.append(self.calculation.better_allocation(vertex, vertex[0], vertex[1]))
+            better_place = [(x, y) for x, col in enumerate(self.crystal) for y, n in enumerate(col) if n == self.crystal.max()]
+
+
+
             for vertex in list_of_max:
-                self.array_index = self.calculation.insert_vertex_in_crystal(vertex, *vector_of_places[0])
-                vector_of_places.pop(0)
+                self.array_index = self.calculation.insert_vertex_in_crystal(vertex, *better_place[0])
+                # vector_of_places.pop()
 
             print("Кристал: ")
             print(self.crystal)
